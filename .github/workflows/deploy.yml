@@ -34,16 +34,14 @@ jobs:
   
   job2:
     name: Deploy to EC2
+    env:
+      DEVOPS_KEY: ${{secrets.DEVOPS_KEY}}
+      PUBLIC_IP: ${{secrets.PUBLIC_IP}}
     runs-on: ubuntu-latest
     needs: job1
 
-    env:
-      DEVOPS_KEY: ${{ secrets.DEVOPS_KEY }}
-      PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
-    
-
     steps:
-      - name: Connect to EC2 SSH and Deploy #Alterar IP da máquina
+      - name: Connect to EC2 SSH and Deploy #Alterar IP da máquina no git
         run: | 
           echo "$DEVOPS_KEY" > devops-key.pem
           chmod 400 devops-key.pem
@@ -54,3 +52,4 @@ jobs:
             docker rm devopslab_site || true
             docker run -d --name devopslab_site -p 80:80 717279707647.dkr.ecr.sa-east-1.amazonaws.com/devopslab_container:v1.0
           EOF
+          rm devops-key.pem
