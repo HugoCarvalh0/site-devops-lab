@@ -31,6 +31,24 @@ jobs:
           docker build -t devops-lab-site:v1.0 .
           docker tag devops-lab-site:v1.0 717279707647.dkr.ecr.sa-east-1.amazonaws.com/devopslab_container:v1.0
           docker push 717279707647.dkr.ecr.sa-east-1.amazonaws.com/devopslab_container:v1.0
+  
+  job2:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    
+    env:
+      DEVOPS_KEY: ${{ secrets.DEVOPS_KEY }}
+      PUBLIC_IP: ${{ secrets.PUBLIC_IP }}
+    
 
-
-      
+    steps:
+      - name: Connect to EC2 SSH and Deploy #Alterar IP da máquina
+        run: | 
+          echo "$DEVOPS_KEY" > devops-key.pem
+          chmod 400 devops-key.pem
+          ssh -o StrictHostKeyChecking=no -i $devops-key.pem ec2-user@$PUBLIC_IP << 'EOF'
+            docker pull 717279707647.dkr.ecr.sa-east-1.amazonaws.com/devopslab_container:v1.0
+            docker stop devopslab_site || true
+            docker rm devopslab_site || true
+            docker run -d --name devopslab_site -p 80:80 717279707647.dkr.ecr.sa-east-1.amazonaws.com/devopslab_container:v1.0
+          EOF
