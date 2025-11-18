@@ -12,7 +12,7 @@ permissions:
 jobs:
   job1:
     name: Build to ECR
-    runs-on: ubuntu-slim
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5.0.1
